@@ -14,10 +14,12 @@ public final class EntityStorage {
   
   public static void loadEntities( final File dir, final EntityLayer layer )
       throws FileNotFoundException {
-    setDetailsLocator( dir );
-    
     loadEntities( dir, layer, true );
     loadEntities( dir, layer, false );
+    
+    for ( final Entity entity : layer.list() ) {
+      loadEntityDetails( dir, entity );
+    }
   }
   
   private static void loadEntities( final File dir, final EntityLayer layer, final boolean solid )
@@ -66,12 +68,23 @@ public final class EntityStorage {
     }
   }
   
+  public static void loadEntityDetails( final File dir, final Entity entity )
+      throws FileNotFoundException {
+    if ( entity.id == 0 ) {
+      return;
+    }
+    
+    final File file = new File( dir, "entity_details/" + entity.id );
+    DetailStorage.loadDetails( file, entity );
+  }
+  
   public static void saveEntities( final File dir, final EntityLayer layer ) {
     saveEntities( dir, layer, true );
     saveEntities( dir, layer, false );
     
-    setDetailsLocator( dir );
-    layer.list().forEach( Entities::writeDetails );
+    for ( final Entity entity : layer.list() ) {
+      saveEntityDetails( dir, entity );
+    }
   }
   
   private static void saveEntities( final File dir, final EntityLayer layer, final boolean solid ) {
@@ -134,8 +147,12 @@ public final class EntityStorage {
     } );
   }
   
-  private static void setDetailsLocator( final File dir ) {
-    final File details = new File( dir, "details" );
-    Entities.detailsLocator = id -> new File( details, String.valueOf( id ) );
+  public static void saveEntityDetails( final File dir, final Entity entity ) {
+    if ( entity.id == 0 ) {
+      return;
+    }
+    
+    final File file = new File( dir, "entity_details/" + entity.id );
+    DetailStorage.saveDetails( file, entity );
   }
 }

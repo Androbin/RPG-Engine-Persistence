@@ -57,7 +57,7 @@ public final class EventStorage {
             writer.write( event );
           }
           
-          writer.newLine();
+          writer.write( '\n' );
         } catch ( final IOException e ) {
           e.printStackTrace();
         }

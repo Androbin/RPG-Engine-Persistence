@@ -14,7 +14,7 @@ public final class ProjectStorage {
   private ProjectStorage() {
   }
   
-  public static File getFile( final File dir0, final Ident id ) {
+  public static File getWorldFile( final File dir0, final Ident id ) {
     return new File( dir0, "worlds/" + id + "/.world" );
   }
   
@@ -99,7 +99,7 @@ public final class ProjectStorage {
   
   public static World loadWorld( final File dir0, final Ident id )
       throws FileNotFoundException {
-    final File dir = getFile( dir0, id );
+    final File dir = getWorldFile( dir0, id );
     return CoreStorage.loadWorld( dir, id );
   }
   
@@ -130,7 +130,7 @@ public final class ProjectStorage {
     FileWriterUtil.writeFile( new File( dir, ".project" ), writer -> {
       try {
         writer.write( project.name );
-        writer.newLine();
+        writer.write( '\n' );
       } catch ( final IOException e ) {
         e.printStackTrace();
       }
@@ -142,7 +142,7 @@ public final class ProjectStorage {
   }
   
   public static void saveWorld( final File dir0, final World world ) {
-    final File dir = getFile( dir0, world.id );
+    final File dir = getWorldFile( dir0, world.id );
     CoreStorage.saveWorld( dir, world );
   }
   
