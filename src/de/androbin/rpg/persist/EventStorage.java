@@ -18,7 +18,7 @@ public final class EventStorage {
     
     try ( final Scanner scanner = new Scanner( new FileReader( file ) ) ) {
       while ( scanner.hasNextLine() ) {
-        final String event = scanner.nextLine();
+        final String line = scanner.nextLine();
         
         if ( !scanner.hasNextLine() ) {
           continue;
@@ -34,6 +34,7 @@ public final class EventStorage {
           continue;
         }
         
+        final String event = line.isEmpty() ? null : line;
         prop.accept( atom, event );
         pointer++;
       }

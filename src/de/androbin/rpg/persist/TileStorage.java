@@ -43,6 +43,8 @@ public final class TileStorage {
         }
       }
     }
+    
+    loadTileEvents( dir, layer );
   }
   
   public static void loadTileEvents( final File dir, final TileLayer layer )
