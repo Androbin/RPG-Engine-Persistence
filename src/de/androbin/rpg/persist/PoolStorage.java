@@ -19,9 +19,7 @@ public final class PoolStorage {
   }
   
   public static void saveDetails( final File file, final Pooled obj ) {
-    final List<Object> details = new ArrayList<>();
-    obj.save( details );
-    saveDetails( file, details );
+    saveDetails( file, obj.save() );
   }
   
   public static void saveDetails( final File file, final List<Object> pool ) {

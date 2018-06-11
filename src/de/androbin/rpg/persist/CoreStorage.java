@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.*;
 
 public final class CoreStorage {
+  public static boolean velvet;
+  
   private CoreStorage() {
   }
   

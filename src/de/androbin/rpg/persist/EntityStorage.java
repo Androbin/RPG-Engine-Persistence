@@ -82,6 +82,10 @@ public final class EntityStorage {
     saveEntities( dir, layer, true );
     saveEntities( dir, layer, false );
     
+    if ( CoreStorage.velvet ) {
+      return;
+    }
+    
     for ( final Entity entity : layer.list() ) {
       saveEntityDetails( dir, entity );
     }

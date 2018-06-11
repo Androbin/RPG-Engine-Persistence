@@ -3,6 +3,8 @@ package de.androbin.rpg.persist.tree;
 import java.io.*;
 import java.net.*;
 import de.androbin.io.*;
+import de.androbin.rpg.entity.*;
+import de.androbin.rpg.tile.*;
 
 public final class Project {
   public final String name;
@@ -36,5 +38,8 @@ public final class Project {
   
   public void unload() {
     DynamicClassLoader.removeDynamicURL( getURL() );
+    
+    Entities.invalidate();
+    Tiles.invalidate();
   }
 }

@@ -30,12 +30,11 @@ public final class EventStorage {
         final Point pos = new Point( x, y );
         final T atom = layer.apply( pos );
         
-        if ( atom == null ) {
-          continue;
+        if ( atom != null ) {
+          final String event = line.isEmpty() ? null : line;
+          prop.accept( atom, event );
         }
         
-        final String event = line.isEmpty() ? null : line;
-        prop.accept( atom, event );
         pointer++;
       }
     }
@@ -47,15 +46,13 @@ public final class EventStorage {
       LoopUtil.forEach( size, pos -> {
         final T atom = layer.apply( pos );
         
-        if ( atom == null ) {
-          return;
-        }
-        
-        final String event = prop.apply( atom );
-        
         try {
-          if ( event != null ) {
-            writer.write( event );
+          if ( atom != null ) {
+            final String event = prop.apply( atom );
+            
+            if ( event != null ) {
+              writer.write( event );
+            }
           }
           
           writer.write( '\n' );

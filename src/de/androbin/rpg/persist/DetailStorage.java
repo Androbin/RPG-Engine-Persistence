@@ -19,9 +19,7 @@ public final class DetailStorage {
   }
   
   public static void saveDetails( final File file, final Detailed obj ) {
-    final Map<String, Object> details = new HashMap<>();
-    obj.save( details );
-    saveDetails( file, details );
+    saveDetails( file, obj.save() );
   }
   
   public static void saveDetails( final File file, final Map<String, Object> details ) {
