@@ -5,6 +5,7 @@ import de.androbin.rpg.*;
 import de.androbin.rpg.world.*;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 public final class CoreStorage {
@@ -13,11 +14,11 @@ public final class CoreStorage {
   private CoreStorage() {
   }
   
-  public static World loadWorld( final File dir, final Ident id )
-      throws FileNotFoundException {
+  public static World loadWorld( final Path dir, final Ident id )
+      throws IOException {
     final World world;
     
-    try ( final Scanner scanner = new Scanner( new FileReader( new File( dir, "world" ) ) ) ) {
+    try ( final Scanner scanner = FileReaderUtil.scanFile( dir.resolve( "world" ) ) ) {
       final int width = scanner.nextInt();
       final int height = scanner.nextInt();
       
@@ -30,41 +31,34 @@ public final class CoreStorage {
     return world;
   }
   
-  public static void saveWorld( final File dir, final World world ) {
+  public static void saveWorld( final Path dir, final World world ) throws IOException {
     final Dimension size = world.size;
     
-    FileWriterUtil.writeFile( new File( dir, "world" ), writer -> {
-      try {
-        writer.write( String.valueOf( size.width ) );
-        writer.write( ' ' );
-        writer.write( String.valueOf( size.height ) );
-      } catch ( final IOException e ) {
-        e.printStackTrace();
-      }
+    FileWriterUtil.writeFile( dir.resolve( "world" ), writer -> {
+      writer.write( String.valueOf( size.width ) );
+      writer.write( ' ' );
+      writer.write( String.valueOf( size.height ) );
     } );
     
     TileStorage.saveTiles( dir, world.tiles );
     EntityStorage.saveEntities( dir, world.entities );
   }
   
-  public static void writeRow( final Writer writer, final int count, final Ident type ) {
+  public static void writeRow( final Writer writer, final int count, final Ident type )
+      throws IOException {
     if ( count == 0 ) {
       return;
     }
     
-    try {
-      writer.write( String.valueOf( count ) );
-      writer.write( ' ' );
-      
-      if ( type == null ) {
-        writer.write( '0' );
-      } else {
-        writer.write( type.toString() );
-      }
-      
-      writer.write( ' ' );
-    } catch ( final IOException e ) {
-      e.printStackTrace();
+    writer.write( String.valueOf( count ) );
+    writer.write( ' ' );
+    
+    if ( type == null ) {
+      writer.write( '0' );
+    } else {
+      writer.write( type.toString() );
     }
+    
+    writer.write( ' ' );
   }
 }

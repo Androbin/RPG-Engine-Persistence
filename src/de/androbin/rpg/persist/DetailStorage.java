@@ -4,25 +4,27 @@ import de.androbin.io.util.*;
 import de.androbin.json.*;
 import de.androbin.rpg.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 public final class DetailStorage {
   private DetailStorage() {
   }
   
-  public static void loadDetails( final File file, final Detailed obj ) {
+  public static void loadDetails( final Path file, final Detailed obj ) {
     obj.load( loadDetails( file ) );
   }
   
-  public static XObject loadDetails( final File file ) {
+  public static XObject loadDetails( final Path file ) {
     return XUtil.readJSON( file ).get().asObject();
   }
   
-  public static void saveDetails( final File file, final Detailed obj ) {
+  public static void saveDetails( final Path file, final Detailed obj ) throws IOException {
     saveDetails( file, obj.save() );
   }
   
-  public static void saveDetails( final File file, final Map<String, Object> details ) {
+  public static void saveDetails( final Path file, final Map<String, Object> details )
+      throws IOException {
     FileWriterUtil.writeFile( file, XObject.toString( details ) );
   }
 }

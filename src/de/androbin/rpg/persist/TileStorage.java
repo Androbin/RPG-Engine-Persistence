@@ -6,19 +6,20 @@ import de.androbin.rpg.tile.*;
 import de.androbin.rpg.world.*;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 public final class TileStorage {
   private TileStorage() {
   }
   
-  public static void loadTiles( final File dir, final TileLayer layer )
-      throws FileNotFoundException {
+  public static void loadTiles( final Path dir, final TileLayer layer )
+      throws IOException {
     final Dimension size = layer.size;
     
     int pointer = 0;
     
-    try ( final Scanner scanner = new Scanner( new FileReader( new File( dir, "tiles" ) ) ) ) {
+    try ( final Scanner scanner = FileReaderUtil.scanFile( dir.resolve( "tiles" ) ) ) {
       while ( scanner.hasNextInt() ) {
         final int count = scanner.nextInt();
         
@@ -47,16 +48,16 @@ public final class TileStorage {
     loadTileEvents( dir, layer );
   }
   
-  public static void loadTileEvents( final File dir, final TileLayer layer )
-      throws FileNotFoundException {
-    EventStorage.loadEvents( new File( dir, "tile_enter_events" ), layer.size, layer::get,
+  public static void loadTileEvents( final Path dir, final TileLayer layer )
+      throws IOException {
+    EventStorage.loadEvents( dir.resolve( "tile_enter_events" ), layer.size, layer::get,
         ( tile, event ) -> tile.enterEvent = event );
   }
   
-  public static void saveTiles( final File dir, final TileLayer layer ) {
+  public static void saveTiles( final Path dir, final TileLayer layer ) throws IOException {
     final Dimension size = layer.size;
     
-    FileWriterUtil.writeFile( new File( dir, "tiles" ), writer -> {
+    FileWriterUtil.writeFile( dir.resolve( "tiles" ), writer -> {
       int lastCount = 0;
       Ident lastType = null;
       
@@ -96,8 +97,8 @@ public final class TileStorage {
     saveTileEvents( dir, layer );
   }
   
-  public static void saveTileEvents( final File dir, final TileLayer layer ) {
-    EventStorage.saveEvents( new File( dir, "tile_enter_events" ), layer.size, layer::get,
+  public static void saveTileEvents( final Path dir, final TileLayer layer ) throws IOException {
+    EventStorage.saveEvents( dir.resolve( "tile_enter_events" ), layer.size, layer::get,
         tile -> tile.enterEvent );
   }
 }

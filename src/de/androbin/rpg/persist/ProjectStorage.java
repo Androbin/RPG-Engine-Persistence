@@ -7,6 +7,8 @@ import de.androbin.rpg.persist.tree.*;
 import de.androbin.rpg.tile.*;
 import de.androbin.rpg.world.*;
 import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 import java.util.function.*;
 import javax.swing.tree.*;
 
@@ -14,59 +16,57 @@ public final class ProjectStorage {
   private ProjectStorage() {
   }
   
-  public static File getWorldFile( final File dir0, final Ident id ) {
-    return new File( dir0, "worlds/" + id + "/.world" );
+  public static Path getWorldFile( final Path dir, final Ident id ) {
+    return dir.resolve( "worlds/" + id + "/.world" );
   }
   
-  public static Project loadProject( final File dir0 ) {
-    final File projectFile = new File( dir0, ".project" );
-    
-    final Project project = FileReaderUtil.readFile( projectFile, reader -> {
-      try {
-        final String name = reader.readLine();
-        return new Project( name );
-      } catch ( final IOException e ) {
-        e.printStackTrace();
-        return null;
-      }
+  public static Project loadProject( final Path dir ) {
+    final Project project = FileReaderUtil.readFileDirty( dir.resolve( ".project" ), reader -> {
+      final String name = reader.readLine();
+      return new Project( name );
     } );
     
     if ( project == null ) {
       return null;
     }
     
-    project.assocDir = dir0;
+    project.assocDir = dir;
     project.load();
     
-    final File worldDir = new File( dir0, "worlds" );
+    final Path worldDir = dir.resolve( "worlds" );
     
-    if ( worldDir.exists() ) {
-      try {
-        loadWorlds( worldDir, null, project.worlds::addItem );
-      } catch ( final FileNotFoundException e ) {
-        e.printStackTrace();
-      }
+    try {
+      loadWorlds( worldDir, null, project.worlds::addItem );
+    } catch ( final IOException e ) {
+      e.printStackTrace();
     }
     
-    final File tileDir = new File( dir0, "json/tile" );
-    final File entityDir = new File( dir0, "json/entity" );
+    try {
+      loadTiles( dir.resolve( "json/tile" ), null, project.tiles::addItem );
+    } catch ( final IOException e ) {
+      e.printStackTrace();
+    }
     
-    loadTiles( tileDir, null, project.tiles::addItem );
-    loadEntities( entityDir, null, project.entities::addItem );
+    try {
+      loadEntities( dir.resolve( "json/entity" ), null, project.entities::addItem );
+    } catch ( final IOException e ) {
+      e.printStackTrace();
+    }
     
     return project;
   }
   
-  public static void loadEntities( final File dir, final String prefix,
-      final Consumer<EntityData> tree ) {
-    for ( final File file : dir.listFiles() ) {
-      final String name = file.getName();
+  public static void loadEntities( final Path dir, final String prefix,
+      final Consumer<EntityData> tree ) throws IOException {
+    for ( final Iterator<Path> iter = Files.list( dir ).iterator(); iter.hasNext(); ) {
+      final Path file = iter.next();
+      final String name = file.getFileName().toString();
       
       if ( name.equals( "package.json" ) ) {
         continue;
       }
       
-      if ( file.isDirectory() ) {
+      if ( Files.isDirectory( file ) ) {
         final String nextPrefix = prefix == null ? name : prefix + "/" + name;
         loadEntities( file, nextPrefix, tree );
       } else {
@@ -77,16 +77,17 @@ public final class ProjectStorage {
     }
   }
   
-  public static void loadTiles( final File dir, final String prefix,
-      final Consumer<TileData> tree ) {
-    for ( final File file : dir.listFiles() ) {
-      final String name = file.getName();
+  public static void loadTiles( final Path dir, final String prefix,
+      final Consumer<TileData> tree ) throws IOException {
+    for ( final Iterator<Path> iter = Files.list( dir ).iterator(); iter.hasNext(); ) {
+      final Path file = iter.next();
+      final String name = file.getFileName().toString();
       
       if ( name.equals( "package.json" ) ) {
         continue;
       }
       
-      if ( file.isDirectory() ) {
+      if ( Files.isDirectory( file ) ) {
         final String nextPrefix = prefix == null ? name : prefix + "/" + name;
         loadTiles( file, nextPrefix, tree );
       } else {
@@ -97,17 +98,17 @@ public final class ProjectStorage {
     }
   }
   
-  public static World loadWorld( final File dir0, final Ident id )
-      throws FileNotFoundException {
-    final File dir = getWorldFile( dir0, id );
+  public static World loadWorld( final Path dir0, final Ident id )
+      throws IOException {
+    final Path dir = getWorldFile( dir0, id );
     return CoreStorage.loadWorld( dir, id );
   }
   
-  public static void loadWorlds( final File dir, final String prefix,
-      final Consumer<World> tree )
-      throws FileNotFoundException {
-    for ( final File file : dir.listFiles() ) {
-      final String name = file.getName();
+  public static void loadWorlds( final Path dir, final String prefix,
+      final Consumer<World> tree ) throws IOException {
+    for ( final Iterator<Path> iter = Files.list( dir ).iterator(); iter.hasNext(); ) {
+      final Path file = iter.next();
+      final String name = file.getFileName().toString();
       
       if ( name.equals( ".world" ) ) {
         final Ident id = Ident.fromSerial( prefix );
@@ -120,20 +121,16 @@ public final class ProjectStorage {
     }
   }
   
-  public static void saveProject( final Project project ) {
+  public static void saveProject( final Project project ) throws IOException {
     if ( project == null ) {
       return;
     }
     
-    final File dir = project.assocDir;
+    final Path dir = project.assocDir;
     
-    FileWriterUtil.writeFile( new File( dir, ".project" ), writer -> {
-      try {
-        writer.write( project.name );
-        writer.write( '\n' );
-      } catch ( final IOException e ) {
-        e.printStackTrace();
-      }
+    FileWriterUtil.writeFile( dir.resolve( ".project" ), writer -> {
+      writer.write( project.name );
+      writer.write( '\n' );
     } );
     
     final AtomTree<World> worlds = project.worlds;
@@ -141,12 +138,13 @@ public final class ProjectStorage {
     saveWorlds( dir, root );
   }
   
-  public static void saveWorld( final File dir0, final World world ) {
-    final File dir = getWorldFile( dir0, world.id );
+  public static void saveWorld( final Path dir0, final World world ) throws IOException {
+    final Path dir = getWorldFile( dir0, world.id );
     CoreStorage.saveWorld( dir, world );
   }
   
-  private static void saveWorlds( final File dir0, final DefaultMutableTreeNode parent ) {
+  private static void saveWorlds( final Path dir0, final DefaultMutableTreeNode parent )
+      throws IOException {
     final int count = parent.getChildCount();
     
     for ( int index = 0; index < count; index++ ) {

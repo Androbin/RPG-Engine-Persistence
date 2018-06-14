@@ -1,10 +1,10 @@
 package de.androbin.rpg.persist.tree;
 
-import java.io.*;
-import java.net.*;
 import de.androbin.io.*;
 import de.androbin.rpg.entity.*;
 import de.androbin.rpg.tile.*;
+import java.net.*;
+import java.nio.file.*;
 
 public final class Project {
   public final String name;
@@ -13,7 +13,7 @@ public final class Project {
   public final EntityTree entities;
   public final WorldTree worlds;
   
-  public File assocDir;
+  public Path assocDir;
   
   public Project( final String name ) {
     this.name = name;
@@ -25,7 +25,7 @@ public final class Project {
   
   private URL getURL() {
     try {
-      return assocDir.toURI().toURL();
+      return assocDir.toUri().toURL();
     } catch ( final MalformedURLException e ) {
       e.printStackTrace();
       return null;

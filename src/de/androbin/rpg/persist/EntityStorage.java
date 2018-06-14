@@ -6,14 +6,15 @@ import de.androbin.rpg.entity.*;
 import de.androbin.rpg.world.*;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 public final class EntityStorage {
   private EntityStorage() {
   }
   
-  public static void loadEntities( final File dir, final EntityLayer layer )
-      throws FileNotFoundException {
+  public static void loadEntities( final Path dir, final EntityLayer layer )
+      throws IOException {
     loadEntities( dir, layer, true );
     loadEntities( dir, layer, false );
     
@@ -22,12 +23,11 @@ public final class EntityStorage {
     }
   }
   
-  private static void loadEntities( final File dir, final EntityLayer layer, final boolean solid )
-      throws FileNotFoundException {
+  private static void loadEntities( final Path dir, final EntityLayer layer, final boolean solid )
+      throws IOException {
     final Dimension size = layer.getSize();
     
-    try ( final Scanner scanner = new Scanner(
-        new FileReader( new File( dir, "entities-" + solid ) ) ) ) {
+    try ( final Scanner scanner = FileReaderUtil.scanFile( dir.resolve( "entities-" + solid ) ) ) {
       int pointer = 0;
       
       while ( scanner.hasNext() ) {
@@ -68,17 +68,17 @@ public final class EntityStorage {
     }
   }
   
-  public static void loadEntityDetails( final File dir, final Entity entity )
-      throws FileNotFoundException {
+  public static void loadEntityDetails( final Path dir, final Entity entity )
+      throws IOException {
     if ( entity.id == 0 ) {
       return;
     }
     
-    final File file = new File( dir, "entity_details/" + entity.id );
+    final Path file = dir.resolve( "entity_details/" + entity.id );
     DetailStorage.loadDetails( file, entity );
   }
   
-  public static void saveEntities( final File dir, final EntityLayer layer ) {
+  public static void saveEntities( final Path dir, final EntityLayer layer ) throws IOException {
     saveEntities( dir, layer, true );
     saveEntities( dir, layer, false );
     
@@ -91,10 +91,11 @@ public final class EntityStorage {
     }
   }
   
-  private static void saveEntities( final File dir, final EntityLayer layer, final boolean solid ) {
+  private static void saveEntities( final Path dir, final EntityLayer layer, final boolean solid )
+      throws IOException {
     final Dimension size = layer.getSize();
     
-    FileWriterUtil.writeFile( new File( dir, "entities-" + solid ), writer -> {
+    FileWriterUtil.writeFile( dir.resolve( "entities-" + solid ), writer -> {
       int lastCount = 0;
       Ident lastType = null;
       
@@ -133,14 +134,10 @@ public final class EntityStorage {
             lastCount = 0;
             lastType = null;
             
-            try {
-              writer.write( type.toString() );
-              writer.write( ' ' );
-              writer.write( String.valueOf( entity.id ) );
-              writer.write( ' ' );
-            } catch ( final IOException e ) {
-              e.printStackTrace();
-            }
+            writer.write( type.toString() );
+            writer.write( ' ' );
+            writer.write( String.valueOf( entity.id ) );
+            writer.write( ' ' );
           }
           
           x += data.size.width - 1;
@@ -151,12 +148,12 @@ public final class EntityStorage {
     } );
   }
   
-  public static void saveEntityDetails( final File dir, final Entity entity ) {
+  public static void saveEntityDetails( final Path dir, final Entity entity ) throws IOException {
     if ( entity.id == 0 ) {
       return;
     }
     
-    final File file = new File( dir, "entity_details/" + entity.id );
+    final Path file = dir.resolve( "entity_details/" + entity.id );
     DetailStorage.saveDetails( file, entity );
   }
 }

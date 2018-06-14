@@ -4,6 +4,7 @@ import de.androbin.io.util.*;
 import de.androbin.mixin.dim.*;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -11,12 +12,12 @@ public final class EventStorage {
   private EventStorage() {
   }
   
-  public static <T> void loadEvents( final File file, final Dimension size,
+  public static <T> void loadEvents( final Path file, final Dimension size,
       final Function<Point, T> layer, final BiConsumer<T, String> prop )
-      throws FileNotFoundException {
+      throws IOException {
     int pointer = 0;
     
-    try ( final Scanner scanner = new Scanner( new FileReader( file ) ) ) {
+    try ( final Scanner scanner = FileReaderUtil.scanFile( file ) ) {
       while ( scanner.hasNextLine() ) {
         final String line = scanner.nextLine();
         
@@ -40,8 +41,8 @@ public final class EventStorage {
     }
   }
   
-  public static <T> void saveEvents( final File file, final Dimension size,
-      final Function<Point, T> layer, final Function<T, String> prop ) {
+  public static <T> void saveEvents( final Path file, final Dimension size,
+      final Function<Point, T> layer, final Function<T, String> prop ) throws IOException {
     FileWriterUtil.writeFile( file, writer -> {
       LoopUtil.forEach( size, pos -> {
         final T atom = layer.apply( pos );
