@@ -16,7 +16,9 @@ public final class PoolStorage {
   }
   
   public static XArray loadDetails( final Path file ) {
-    return XUtil.readJSON( file ).get().asArray();
+    return XUtil.readJSON( file )
+        .map( XValue::asArray )
+        .orElseGet( XArray::new );
   }
   
   public static void saveDetails( final Path file, final Pooled obj ) throws IOException {
@@ -24,6 +26,6 @@ public final class PoolStorage {
   }
   
   public static void saveDetails( final Path file, final List<Object> pool ) throws IOException {
-    FileWriterUtil.writeFile( file, XArray.toString( pool ) );
+    FileWriterUtil.writeFile( file, XArray.toString( pool, false ) );
   }
 }

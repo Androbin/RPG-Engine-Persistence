@@ -16,7 +16,9 @@ public final class DetailStorage {
   }
   
   public static XObject loadDetails( final Path file ) {
-    return XUtil.readJSON( file ).get().asObject();
+    return XUtil.readJSON( file )
+        .map( XValue::asObject )
+        .orElseGet( XObject::new );
   }
   
   public static void saveDetails( final Path file, final Detailed obj ) throws IOException {
@@ -25,6 +27,6 @@ public final class DetailStorage {
   
   public static void saveDetails( final Path file, final Map<String, Object> details )
       throws IOException {
-    FileWriterUtil.writeFile( file, XObject.toString( details ) );
+    FileWriterUtil.writeFile( file, XObject.toString( details, false ) );
   }
 }

@@ -74,17 +74,13 @@ public final class EntityStorage {
       return;
     }
     
-    final Path file = dir.resolve( "entity_details/" + entity.id );
+    final Path file = dir.resolve( "entity_details/" + entity.id + ".json" );
     DetailStorage.loadDetails( file, entity );
   }
   
   public static void saveEntities( final Path dir, final EntityLayer layer ) throws IOException {
     saveEntities( dir, layer, true );
     saveEntities( dir, layer, false );
-    
-    if ( CoreStorage.velvet ) {
-      return;
-    }
     
     for ( final Entity entity : layer.list() ) {
       saveEntityDetails( dir, entity );
@@ -153,7 +149,7 @@ public final class EntityStorage {
       return;
     }
     
-    final Path file = dir.resolve( "entity_details/" + entity.id );
+    final Path file = dir.resolve( "entity_details/" + entity.id + ".json" );
     DetailStorage.saveDetails( file, entity );
   }
 }

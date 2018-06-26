@@ -9,8 +9,6 @@ import java.nio.file.*;
 import java.util.*;
 
 public final class CoreStorage {
-  public static boolean velvet;
-  
   private CoreStorage() {
   }
   
@@ -44,7 +42,7 @@ public final class CoreStorage {
     EntityStorage.saveEntities( dir, world.entities );
   }
   
-  public static void writeRow( final Writer writer, final int count, final Ident type )
+  protected static void writeRow( final Writer writer, final int count, final Ident type )
       throws IOException {
     if ( count == 0 ) {
       return;
