@@ -13,14 +13,27 @@ public final class EntityStorage {
   private EntityStorage() {
   }
   
+  public static void cleanEntityDetails( final Path dir0, final EntityLayer layer )
+      throws IOException {
+    final Path dir = dir0.resolve( "entity_details" );
+    
+    for ( final Iterator<Path> iter = Files.list( dir ).iterator(); iter.hasNext(); ) {
+      final Path file = iter.next();
+      final String name = file.getFileName().toString();
+      final int id = Integer.parseInt( name.substring( 0, name.length() - 5 ) );
+      
+      if ( layer.findById( id ) == null ) {
+        Files.delete( file );
+      }
+    }
+  }
+  
   public static void loadEntities( final Path dir, final EntityLayer layer )
       throws IOException {
     loadEntities( dir, layer, true );
     loadEntities( dir, layer, false );
     
-    for ( final Entity entity : layer.list() ) {
-      loadEntityDetails( dir, entity );
-    }
+    loadEntityDetails( dir, layer );
   }
   
   private static void loadEntities( final Path dir, final EntityLayer layer, final boolean solid )
@@ -68,7 +81,14 @@ public final class EntityStorage {
     }
   }
   
-  public static void loadEntityDetails( final Path dir, final Entity entity )
+  public static void loadEntityDetails( final Path dir, final EntityLayer layer )
+      throws IOException {
+    for ( final Entity entity : layer.list() ) {
+      loadEntityDetails( dir, entity );
+    }
+  }
+  
+  private static void loadEntityDetails( final Path dir, final Entity entity )
       throws IOException {
     if ( entity.id == 0 ) {
       return;
@@ -82,9 +102,8 @@ public final class EntityStorage {
     saveEntities( dir, layer, true );
     saveEntities( dir, layer, false );
     
-    for ( final Entity entity : layer.list() ) {
-      saveEntityDetails( dir, entity );
-    }
+    cleanEntityDetails( dir, layer );
+    saveEntityDetails( dir, layer );
   }
   
   private static void saveEntities( final Path dir, final EntityLayer layer, final boolean solid )
@@ -144,7 +163,14 @@ public final class EntityStorage {
     } );
   }
   
-  public static void saveEntityDetails( final Path dir, final Entity entity ) throws IOException {
+  public static void saveEntityDetails( final Path dir, final EntityLayer layer )
+      throws IOException {
+    for ( final Entity entity : layer.list() ) {
+      saveEntityDetails( dir, entity );
+    }
+  }
+  
+  private static void saveEntityDetails( final Path dir, final Entity entity ) throws IOException {
     if ( entity.id == 0 ) {
       return;
     }
