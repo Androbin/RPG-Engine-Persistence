@@ -72,7 +72,7 @@ public final class ProjectStorage {
       } else {
         final String simpleName = name.substring( 0, name.length() - 5 );
         final String serial = prefix == null ? simpleName : prefix + "/" + simpleName;
-        tree.accept( Entities.getData( Ident.fromSerial( serial ) ) );
+        tree.accept( Entities.getData( Ident.parse( serial ) ) );
       }
     }
   }
@@ -93,7 +93,7 @@ public final class ProjectStorage {
       } else {
         final String simpleName = name.substring( 0, name.length() - 5 );
         final String serial = prefix == null ? simpleName : prefix + "/" + simpleName;
-        tree.accept( Tiles.getData( Ident.fromSerial( serial ) ) );
+        tree.accept( Tiles.getData( Ident.parse( serial ) ) );
       }
     }
   }
@@ -111,7 +111,7 @@ public final class ProjectStorage {
       final String name = file.getFileName().toString();
       
       if ( name.equals( ".world" ) ) {
-        final Ident id = Ident.fromSerial( prefix );
+        final Ident id = Ident.parse( prefix );
         final World world = CoreStorage.loadWorld( file, id );
         tree.accept( world );
       } else {

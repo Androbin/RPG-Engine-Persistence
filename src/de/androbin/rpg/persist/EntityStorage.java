@@ -17,6 +17,10 @@ public final class EntityStorage {
       throws IOException {
     final Path dir = dir0.resolve( "entity_details" );
     
+    if ( !Files.exists( dir ) ) {
+      return;
+    }
+    
     for ( final Iterator<Path> iter = Files.list( dir ).iterator(); iter.hasNext(); ) {
       final Path file = iter.next();
       final String name = file.getFileName().toString();
@@ -56,12 +60,12 @@ public final class EntityStorage {
             scanner.nextInt();
             continue;
           } else {
-            type = Ident.fromSerial( scanner.next() );
+            type = Ident.parse( scanner.next() );
             id = 0;
           }
         } else {
           count = 1;
-          type = Ident.fromSerial( scanner.next() );
+          type = Ident.parse( scanner.next() );
           id = scanner.nextInt();
         }
         

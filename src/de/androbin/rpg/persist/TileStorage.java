@@ -29,7 +29,7 @@ public final class TileStorage {
           continue;
         }
         
-        final Ident type = Ident.fromSerial( scanner.next() );
+        final Ident type = Ident.parse( scanner.next() );
         final TileData data = Tiles.getData( type );
         
         for ( int i = 0; i < count; i++ ) {
