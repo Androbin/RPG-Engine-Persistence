@@ -1,6 +1,7 @@
 package de.androbin.rpg.persist;
 
 import de.androbin.io.util.*;
+import de.androbin.json.*;
 import de.androbin.mixin.dim.*;
 import java.awt.*;
 import java.io.*;
@@ -13,7 +14,7 @@ public final class EventStorage {
   }
   
   public static <T> void loadEvents( final Path file, final Dimension size,
-      final Function<Point, T> layer, final BiConsumer<T, String> prop )
+      final Function<Point, T> layer, final BiConsumer<T, XArray> prop )
       throws IOException {
     int pointer = 0;
     
@@ -32,7 +33,7 @@ public final class EventStorage {
         final T atom = layer.apply( pos );
         
         if ( atom != null ) {
-          final String event = line.isEmpty() ? null : line;
+          final XArray event = line.isEmpty() ? null : XUtil.parseJSON( line ).asArray();
           prop.accept( atom, event );
         }
         
@@ -42,16 +43,16 @@ public final class EventStorage {
   }
   
   public static <T> void saveEvents( final Path file, final Dimension size,
-      final Function<Point, T> layer, final Function<T, String> prop ) throws IOException {
+      final Function<Point, T> layer, final Function<T, XArray> prop ) throws IOException {
     FileWriterUtil.writeFile( file, writer -> {
       LoopUtil.forEachDirty( size, pos -> {
         final T atom = layer.apply( pos );
         
         if ( atom != null ) {
-          final String event = prop.apply( atom );
+          final XArray event = prop.apply( atom );
           
           if ( event != null ) {
-            writer.write( event );
+            writer.write( event.toString() );
           }
         }
         
