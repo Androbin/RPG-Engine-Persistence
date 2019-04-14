@@ -7,3 +7,4 @@ Dependencies:
  - JSON
  - Mixins
  - RPG Engine
+ - Space

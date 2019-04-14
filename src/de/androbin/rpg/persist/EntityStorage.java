@@ -70,6 +70,7 @@ public final class EntityStorage {
         }
         
         final EntityData data = Entities.getData( type );
+        final Dimension dataSize = data.shape.getSize();
         
         for ( int i = 0; i < count; i++ ) {
           final int x = pointer % size.width;
@@ -79,7 +80,7 @@ public final class EntityStorage {
           final Entity entity = Entities.create( data, id );
           layer.add( entity, pos );
           
-          pointer += data.size.width;
+          pointer += dataSize.width;
         }
       }
     }
@@ -136,6 +137,7 @@ public final class EntityStorage {
           }
           
           final EntityData data = entity.getData();
+          final Dimension dataSize = data.shape.getSize();
           final Ident type = data.type;
           
           if ( entity.id == 0 ) {
@@ -159,7 +161,7 @@ public final class EntityStorage {
             writer.write( ' ' );
           }
           
-          x += data.size.width - 1;
+          x += dataSize.width - 1;
         }
       }
       
