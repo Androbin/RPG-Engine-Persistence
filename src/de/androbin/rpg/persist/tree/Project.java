@@ -34,12 +34,12 @@ public final class Project {
   
   public void load() {
     DynamicClassLoader.addDynamicURL( getURL() );
+    
+    Entities.invalidate();
+    Tiles.invalidate();
   }
   
   public void unload() {
     DynamicClassLoader.removeDynamicURL( getURL() );
-    
-    Entities.invalidate();
-    Tiles.invalidate();
   }
 }
