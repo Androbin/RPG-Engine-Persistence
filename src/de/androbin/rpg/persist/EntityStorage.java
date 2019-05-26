@@ -88,7 +88,9 @@ public final class EntityStorage {
   
   public static void loadEntityDetails( final Path dir, final EntityLayer layer )
       throws IOException {
-    for ( final Entity entity : layer.list() ) {
+    final Iterable<Entity> entities = layer.stream()::iterator;
+    
+    for ( final Entity entity : entities ) {
       loadEntityDetails( dir, entity );
     }
   }
@@ -171,7 +173,9 @@ public final class EntityStorage {
   
   public static void saveEntityDetails( final Path dir, final EntityLayer layer )
       throws IOException {
-    for ( final Entity entity : layer.list() ) {
+    final Iterable<Entity> entities = layer.stream()::iterator;
+    
+    for ( final Entity entity : entities ) {
       saveEntityDetails( dir, entity );
     }
   }
